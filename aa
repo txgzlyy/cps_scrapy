@@ -1,0 +1,1 @@
+scrapy crawl woquge -o w_y.json -s FEED_EXPORT_ENCODING=UTF-8
