@@ -1,56 +1,48 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import time
 
 from ..items import CpsBqgItem
 
 
 class WoqugeSpider(scrapy.Spider):
     name = 'woquge'
-    allowed_domains = ['woquge.com']
-    start_urls = ['https://www.woquge.com/xiuzhenxiaoshuo/']
+    allowed_domains = ['xbiquge.la']
+    start_urls = ['http://www.xbiquge.la/']
+
     # start_urls = ['https://www.woquge.com/2_2714/151901248.html']
 
+    def start_requests(self):
+        lists = ['http://www.xbiquge.la/19/19677/', 'http://www.xbiquge.la/5/5395/', 'http://www.xbiquge.la/0/215/',
+                 'http://www.xbiquge.la/7/7416/', 'http://www.xbiquge.la/15/15977/']
+        for _ in lists:
+            print(_)
+            yield scrapy.Request(_)
+
     def parse(self, response):
-        xiaoshuos = response.xpath("//div[@id='newscontent']//li")
-        print(123)
-        for i in xiaoshuos:
-            data = {}
-
-            name = i.xpath("./span[@class='s2']//a/text()").extract_first()
-            new_capter = i.xpath("./span[@class='s3']//a/text()").extract_first()
-            auther = i.xpath("./span[@class='s5']/text()").extract_first()
-
-            data['name'] = name
-            data['new_capter'] = new_capter
-            data['auther'] = auther
-            # yield item
-            url = 'https://www.woquge.com' + i.xpath("./span[@class='s2']//a/@href").extract_first()
-            # print(url)
-            yield scrapy.Request(url, callback=self.get_xiaoshuo, meta={"data": data, 'base_url': url})
-
-    def get_xiaoshuo(self, response):
-        data = response.meta['data']
-        base_url = response.meta['base_url']
-        capters = response.xpath("//div[@id='list']//dd//a")
-        for i in capters:
-            url = base_url + i.xpath("./@href").extract_first()
-            print(url)
-            yield scrapy.Request(url, callback=self.get_txt, meta={"data": data})
+        tittle = response.xpath("//h1/text()").extract_first()
+        capter_list = response.xpath("//div[@id='list']//dl//dd")
+        for index, i in enumerate(capter_list):
+            url = 'http://www.xbiquge.la' + i.xpath("./a/@href").extract_first()
+            time.sleep(2)
+            yield scrapy.Request(url, callback=self.get_txt, meta={"num": index, 'tittle': tittle})
 
     def get_txt(self, response):
-        data = response.meta['data']
+        data = response.meta
+        num = data.get('num') + 1
+        tittle = data.get('tittle')
+        print(num, '-------------------------------------------------------------------------')
         item = {}
 
         capter = response.xpath("//h1/text()").extract_first()
-        txts = response.xpath("//div[@id='content']//p")
+        txts = response.xpath("//div[@id='content']/text()").extract()
         strs = ''
         for i in txts:
-            txt = i.xpath('./text()').extract_first().lstrip()  # 去除左边空格
+            txt = i.strip()  # 去除空格
             strs = strs + txt
-
-        item['name'] = data['name']
-        item['new_capter'] = data['new_capter']
-        item['auther'] = data['auther']
-        item["txt"] = strs
+        item["num"] = num
+        item["name"] = tittle
+        item['auther'] = "忘语"
         item["capter"] = capter
+        item["txt"] = strs
         yield item

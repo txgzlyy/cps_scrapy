@@ -19,6 +19,7 @@ NEWSPIDER_MODULE = 'cps_bqg.spiders'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
+# HTTPERROR_ALLOWED_CODES = [503]
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 # CONCURRENT_REQUESTS = 32
@@ -90,5 +91,5 @@ ROBOTSTXT_OBEY = True
 
 ITEM_PIPELINES = {
     # 'mySpider.pipelines.SomePipeline': 300,
-    "cps_bqg.pipelines.CpsBqgPipeline": 300
+    # "cps_bqg.pipelines.CpsBqgPipeline": 300
 }

@@ -3,7 +3,7 @@
 # Please refer to the documentation for information on how to create and manage
 # your spiders.
 
-from elasticsearch_dsl import DocType, Date, Nested, Boolean, analyzer, Completion, Keyword, Text, Integer
+from elasticsearch_dsl import Document, Date, Nested, Boolean, analyzer, Completion, Keyword, Text, Integer
 
 
 from elasticsearch_dsl.connections import connections
@@ -18,7 +18,7 @@ connections.create_connection(hosts=[ES_HOST])
 # 定义 es model
 
 
-class TenderNoticeType(DocType):
+class TenderNoticeType(Document):
     # 全部字段类型
     name = Text(analyzer="ik_max_word")
     new_capter = Text(analyzer="ik_max_word")
